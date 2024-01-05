@@ -1,0 +1,7 @@
+<div *ngFor="let row of board; index as i" class="row">
+    <div *ngFor="let base of row; index as j" class="tile" [class]="base.spriteBase">
+        <div class="piece" [style.background-image]="'url(' + base.piece?.sprite + ')'"
+            (click)="move(base.piece, i, j)">
+        </div>
+    </div>
+</div>
