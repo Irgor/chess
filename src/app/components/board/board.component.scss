@@ -29,6 +29,10 @@ $tile-size: 80px;
             border: 2px solid white;
         }
 
+        .pointer {
+            cursor: pointer;
+        }
+
         .movable {
             height: 40%;
             width: 40%;
@@ -39,12 +43,12 @@ $tile-size: 80px;
     }
 
     .light {
-        background-image: url('../../../assets/images/square brown light.png');
+        background-image: url('../../../assets/images/square_brown_light.png');
         background-size: 105%;
     }
 
     .dark {
-        background-image: url('../../../assets/images/square brown dark.png');
+        background-image: url('../../../assets/images/square_brown_dark.png');
         background-size: 105%;
     }
 

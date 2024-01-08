@@ -118,14 +118,15 @@ export class BoardComponent implements OnInit {
     const origin = { i: piece.i, j: piece.j };
     const isWhite = piece.color == 'w';
 
-    console.log(type);
-
     switch (type) {
       case 'pawn':
         this.pawnPredictions(isWhite, origin);
         break;
       case 'rook':
         this.rookPredictions(isWhite, origin);
+        break;
+      case 'knight':
+        this.knightPredictions(isWhite, origin)
         break;
     }
   }
@@ -157,7 +158,6 @@ export class BoardComponent implements OnInit {
   }
 
   // EACH PIECE MOVE PREDICT //
-
   pawnPredictions(isWhite: boolean, origin: cord) {
     let pawnMaxIMove = isWhite ? 1 : -1;
 
@@ -218,55 +218,80 @@ export class BoardComponent implements OnInit {
   }
 
   rookPredictions(isWhite: boolean, origin: cord) {
-    let maxI = this.boardSize, maxJ = this.boardSize;
-    let minI = 0, minJ = 0;
     const opponent = isWhite ? 'b' : 'w';
-    const sub = isWhite ? 1 : -1;
+
+    let higherI = this.boardSize;
+    let lowerI = 0;
+
+    let higherJ = this.boardSize;
+    let lowerJ = 0;
 
     for (let i = origin.i + 1; i < this.boardSize; i++) {
       if (this.board[i][origin.j].piece) {
         if (this.board[i][origin.j].piece?.color == opponent) {
-          maxI = i;
+          higherI = i;
         } else {
-          maxI = i - sub;
+          higherI = i - 1
         }
 
         break;
       }
     }
-
 
     for (let i = origin.i - 1; i >= 0; i--) {
       if (this.board[i][origin.j].piece) {
         if (this.board[i][origin.j].piece?.color == opponent) {
-          minI = i;
+          lowerI = i;
         } else {
-          minI = i - sub;
+          lowerI = i + 1
         }
 
         break;
       }
     }
 
-    console.log(maxI, minI)
+    for (let j = origin.j + 1; j < this.boardSize; j++) {
+      if (this.board[origin.i][j].piece) {
+        if (this.board[origin.i][j].piece?.color == opponent) {
+          higherJ = j;
+        } else {
+          higherJ = j - 1;
+        }
+
+        break;
+      }
+    }
+
+    for (let j = origin.j - 1; j >= 0; j--) {
+      if (this.board[origin.i][j].piece) {
+        if (this.board[origin.i][j].piece?.color == opponent) {
+          lowerJ = j;
+        } else {
+          lowerJ = j + 1;
+        }
+
+        break;
+      }
+    }
 
     for (let i = 0; i < this.boardSize; i++) {
       for (let j = 0; j < this.boardSize; j++) {
-
         if (i == origin.i && j == origin.j) {
           continue;
         }
 
-        if (maxI && i <= maxI && j == origin.j) {
+        if (j == origin.j && i <= higherI && i >= lowerI) {
           this.board[i][j].movable = true;
         }
 
-        if (minI && i >= minI && j == origin.j) {
+        if (i == origin.i && j <= higherJ && j >= lowerJ) {
           this.board[i][j].movable = true;
         }
-
       }
     }
+  }
+
+  knightPredictions(isWhite: boolean, origin: cord) {
 
   }
 }

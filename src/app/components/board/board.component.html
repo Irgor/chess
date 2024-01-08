@@ -1,8 +1,10 @@
 <div *ngFor="let row of board; index as i" class="row">
     <div *ngFor="let base of row; index as j" class="base" [class]="base.spriteBase">
         <div class="piece" [style.background-image]="'url(' + base.piece?.sprite + ')'"
-            [ngClass]="{'selected': idToMove == base.id}" (click)="move(base.piece, i, j, base.id, base.movable)">
+            [ngClass]="{'selected': idToMove == base.id, 'pointer': base.piece?.color == turn || base.movable}"
+            (click)="move(base.piece, i, j, base.id, base.movable)">
         </div>
-        <div class="movable" *ngIf="base.movable" (click)="move(base.piece, i, j, base.id, base.movable)"></div>
+        <div class="movable" [ngClass]="{'pointer': base.piece?.color == turn || base.movable}" *ngIf="base.movable"
+            (click)="move(base.piece, i, j, base.id, base.movable)"></div>
     </div>
 </div>
