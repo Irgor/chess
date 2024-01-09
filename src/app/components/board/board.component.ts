@@ -128,6 +128,9 @@ export class BoardComponent implements OnInit {
       case 'knight':
         this.knightPredictions(isWhite, origin)
         break;
+      case 'bishop':
+        this.bishopPredictions(isWhite, origin)
+        break;
     }
   }
 
@@ -292,6 +295,40 @@ export class BoardComponent implements OnInit {
   }
 
   knightPredictions(isWhite: boolean, origin: cord) {
+    const opponent = isWhite ? 'b' : 'w';
+
+    this.checkKnight(origin, 2, 1, opponent);
+    this.checkKnight(origin, 2, -1, opponent);
+
+    this.checkKnight(origin, 1, 2, opponent);
+    this.checkKnight(origin, 1, -2, opponent);
+
+    this.checkKnight(origin, -1, 2, opponent);
+    this.checkKnight(origin, -1, -2, opponent);
+
+    this.checkKnight(origin, -2, 1, opponent);
+    this.checkKnight(origin, -2, -1, opponent);
 
   }
+
+  checkKnight(origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b') {
+    if (this.board[origin.i - iMove]) {
+      if (this.board[origin.i - iMove][origin.j - jMove]) {
+        if (this.board[origin.i - iMove][origin.j - jMove].piece?.color == opponent ||
+          !this.board[origin.i - iMove][origin.j - jMove].piece) {
+          this.board[origin.i - iMove][origin.j - jMove].movable = true;
+        }
+      }
+    }
+  }
+
+  bishopPredictions(isWhite: Boolean, origin: cord) {
+    let leftDiag = 0;
+    let rightDiag = 0;
+
+    for(let i = 0; i < this.boardSize; i++) {
+      
+    }
+  }
+
 }
