@@ -326,18 +326,79 @@ export class BoardComponent implements OnInit {
   bishopPredictions(isWhite: Boolean, origin: cord) {
     const opponent = isWhite ? 'b' : 'w';
 
+
+    let maxLeft = this.boardSize;
+    let foundMaxLeft = false;
+
+    let maxRight = this.boardSize;
+    let foundMaxRight = false;
+
+    let minLeft = 0;
+    let foundMinLeft = false;
+
+    let minRight = 0;
+    let foundMinRight = false;
+
     for (let i = 0; i < this.boardSize; i++) {
+      const distance = Math.max(i, origin.i) - Math.min(i, origin.i);
+
       if (i == origin.i) {
         continue;
       }
 
+      if (this.board[i][origin.j - distance] && this.board[i][origin.j - distance].piece) {
+        if (i > origin.i && !foundMaxLeft) {
+          maxLeft = i;
+
+          if (this.board[i][origin.j - distance].piece?.color != opponent) {
+            maxLeft = i - 1;
+          }
+
+          foundMaxLeft = true;
+        }
+
+        if (i < origin.i && !foundMinLeft) {
+          minLeft = i;
+
+          if (this.board[i][origin.j - distance].piece?.color != opponent) {
+            minLeft = i + 1;
+          }
+        }
+      }
+
+      if (this.board[i][origin.j + distance] && this.board[i][origin.j + distance].piece) {
+        if (i > origin.i && !foundMaxRight) {
+          maxRight = i;
+
+          if (this.board[i][origin.j + distance].piece?.color != opponent) {
+            maxRight = i - 1;
+          }
+
+          foundMaxRight = true;
+        }
+
+        if (i < origin.i && !foundMinRight) {
+          minRight = i;
+
+          if (this.board[i][origin.j + distance].piece?.color != opponent) {
+            minRight = i + 1;
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < this.boardSize; i++) {
       const distance = Math.max(i, origin.i) - Math.min(i, origin.i);
 
-      if (this.board[i][origin.j - distance]) {
+      if (i == origin.i) {
+        continue;
+      }
+
+      if (this.board[i][origin.j - distance] && i >= minLeft && i <= maxLeft) {
         this.board[i][origin.j - distance].movable = true;
       }
 
-      if (this.board[i][origin.j + distance]) {
+      if (this.board[i][origin.j + distance] && i >= minRight && i <= maxRight) {
         this.board[i][origin.j + distance].movable = true;
       }
     }
