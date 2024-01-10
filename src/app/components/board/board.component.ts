@@ -132,6 +132,9 @@ export class BoardComponent implements OnInit {
       case 'bishop':
         this.bishopPredictions(isWhite, origin)
         break;
+      case 'king':
+        this.kingPrediction(isWhite, origin)
+        break;
     }
   }
 
@@ -285,34 +288,22 @@ export class BoardComponent implements OnInit {
   knightPredictions(isWhite: boolean, origin: cord) {
     const opponent = isWhite ? 'b' : 'w';
 
-    this.checkKnight(origin, 2, 1, opponent);
-    this.checkKnight(origin, 2, -1, opponent);
+    this.checkFixedMove(origin, 2, 1, opponent);
+    this.checkFixedMove(origin, 2, -1, opponent);
 
-    this.checkKnight(origin, 1, 2, opponent);
-    this.checkKnight(origin, 1, -2, opponent);
+    this.checkFixedMove(origin, 1, 2, opponent);
+    this.checkFixedMove(origin, 1, -2, opponent);
 
-    this.checkKnight(origin, -1, 2, opponent);
-    this.checkKnight(origin, -1, -2, opponent);
+    this.checkFixedMove(origin, -1, 2, opponent);
+    this.checkFixedMove(origin, -1, -2, opponent);
 
-    this.checkKnight(origin, -2, 1, opponent);
-    this.checkKnight(origin, -2, -1, opponent);
+    this.checkFixedMove(origin, -2, 1, opponent);
+    this.checkFixedMove(origin, -2, -1, opponent);
 
-  }
-
-  checkKnight(origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b') {
-    if (this.board[origin.i - iMove]) {
-      if (this.board[origin.i - iMove][origin.j - jMove]) {
-        if (this.board[origin.i - iMove][origin.j - jMove].piece?.color == opponent ||
-          !this.board[origin.i - iMove][origin.j - jMove].piece) {
-          this.board[origin.i - iMove][origin.j - jMove].movable = true;
-        }
-      }
-    }
   }
 
   bishopPredictions(isWhite: Boolean, origin: cord) {
     const opponent = isWhite ? 'b' : 'w';
-
 
     let maxLeft = this.boardSize;
     let foundMaxLeft = false;
@@ -391,4 +382,27 @@ export class BoardComponent implements OnInit {
     }
   }
 
+  kingPrediction(isWhite: boolean, origin: cord) {
+    const opponent = isWhite ? 'b' : 'w';
+
+    this.checkFixedMove(origin, -1, -1, opponent);
+    this.checkFixedMove(origin, -1, 0, opponent);
+    this.checkFixedMove(origin, -1, 1, opponent);
+    this.checkFixedMove(origin, 0, -1, opponent);
+    this.checkFixedMove(origin, 0, 1, opponent);
+    this.checkFixedMove(origin, 1, -1, opponent);
+    this.checkFixedMove(origin, 1, 0, opponent);
+    this.checkFixedMove(origin, 1, 1, opponent);
+  }
+
+  checkFixedMove(origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b') {
+    if (this.board[origin.i - iMove]) {
+      if (this.board[origin.i - iMove][origin.j - jMove]) {
+        if (this.board[origin.i - iMove][origin.j - jMove].piece?.color == opponent ||
+          !this.board[origin.i - iMove][origin.j - jMove].piece) {
+          this.board[origin.i - iMove][origin.j - jMove].movable = true;
+        }
+      }
+    }
+  }
 }
