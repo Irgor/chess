@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { max } from 'rxjs';
 import { Base } from 'src/app/models/base.model';
 import { Piece } from 'src/app/models/piece.model';
 
@@ -323,11 +324,36 @@ export class BoardComponent implements OnInit {
   }
 
   bishopPredictions(isWhite: Boolean, origin: cord) {
-    let leftDiag = 0;
-    let rightDiag = 0;
+    const opponent = isWhite ? 'b' : 'w';
+    let maxI = null;
+    let minI = null;
 
-    for(let i = 0; i < this.boardSize; i++) {
-      
+    for (let i = 0; i < this.boardSize; i++) {
+      if (i == origin.i) {
+        continue;
+      }
+
+      const distance = Math.max(i, origin.i) - Math.min(i, origin.i);
+
+      if(maxI && i > maxI) {
+        continue;
+      }
+
+      if (this.board[i][origin.j - distance]) {
+        if (this.board[i][origin.j - distance].piece) {
+          maxI = i - 1;
+
+          if (this.board[i][origin.j - distance].piece?.color == opponent) {
+            maxI = i;
+          }
+        }
+
+        this.board[i][origin.j - distance].movable = true;
+      }
+
+      if (this.board[i][origin.j + distance]) {
+        this.board[i][origin.j + distance].movable = true;
+      }
     }
   }
 
