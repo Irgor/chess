@@ -325,8 +325,6 @@ export class BoardComponent implements OnInit {
 
   bishopPredictions(isWhite: Boolean, origin: cord) {
     const opponent = isWhite ? 'b' : 'w';
-    let maxI = null;
-    let minI = null;
 
     for (let i = 0; i < this.boardSize; i++) {
       if (i == origin.i) {
@@ -335,19 +333,7 @@ export class BoardComponent implements OnInit {
 
       const distance = Math.max(i, origin.i) - Math.min(i, origin.i);
 
-      if(maxI && i > maxI) {
-        continue;
-      }
-
       if (this.board[i][origin.j - distance]) {
-        if (this.board[i][origin.j - distance].piece) {
-          maxI = i - 1;
-
-          if (this.board[i][origin.j - distance].piece?.color == opponent) {
-            maxI = i;
-          }
-        }
-
         this.board[i][origin.j - distance].movable = true;
       }
 
