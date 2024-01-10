@@ -175,30 +175,17 @@ export class BoardComponent implements OnInit {
 
     let j = origin.j;
     for (let i = 0; i < this.boardSize; i++) {
-      let canIMove = false;
 
       if (isWhite) {
-        canIMove = i <= origin.i + pawnMaxIMove && i > origin.i;
-
-        for (let h = origin.i + 1; h <= origin.i + pawnMaxIMove; h++) {
-          if (this.board[h][j].piece) {
-            canIMove = false;
-          }
+        if (i <= origin.i + pawnMaxIMove && i > origin.i) {
+          this.board[i][j].movable = !this.board[i][j].piece
         }
       }
 
       if (!isWhite) {
-        canIMove = i >= origin.i + pawnMaxIMove && i < origin.i;
-
-        for (let h = origin.i - 1; h >= origin.i + pawnMaxIMove; h--) {
-          if (!!this.board[h][j].piece) {
-            canIMove = false;
-          }
+        if (i >= origin.i + pawnMaxIMove && i < origin.i) {
+          this.board[i][j].movable = !this.board[i][j].piece
         }
-      }
-
-      if (canIMove) {
-        this.board[i][j].movable = true;
       }
     }
 
