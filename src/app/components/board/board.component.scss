@@ -29,8 +29,8 @@ $tile-size: 80px;
             border: 2px solid white;
         }
 
-        .pointer {
-            cursor: pointer;
+        .check {
+            background-color: #ff000020;
         }
 
         .movable {
@@ -41,6 +41,11 @@ $tile-size: 80px;
             position: absolute;
         }
     }
+
+    .pointer {
+        cursor: pointer;
+    }
+
 
     .light {
         background-image: url('../../../assets/images/square_brown_light.png');

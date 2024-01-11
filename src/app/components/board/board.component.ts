@@ -133,7 +133,10 @@ export class BoardComponent implements OnInit {
         this.bishopPredictions(isWhite, origin)
         break;
       case 'king':
-        this.kingPrediction(isWhite, origin)
+        this.kingPredictions(isWhite, origin)
+        break;
+      case 'queen':
+        this.queenPredictions(isWhite, origin);
         break;
     }
   }
@@ -148,12 +151,57 @@ export class BoardComponent implements OnInit {
   }
 
   endTurn() {
+    this.removeChecks();
     this.lastPiece = null;
     this.isTarget = false;
     this.turn = this.turn == 'w' ? 'b' : 'w';
     this.rounds++;
     this.idToMove = 0;
+    this.isCheck();
+  }
+
+  removeChecks() {
+    for (let i = 0; i < this.boardSize; i++) {
+      for (let j = 0; j < this.boardSize; j++) {
+        const piece = this.board[i][j].piece;
+        const name = piece?.name == 'king';
+
+        if (name) {
+          this.board[i][j].piece!.inCheck = false;
+        }
+      }
+    }
+  }
+
+  isCheck() {
+    for (let i = 0; i < this.boardSize; i++) {
+      for (let j = 0; j < this.boardSize; j++) {
+        const piece = this.board[i][j].piece;
+        if (piece) {
+          this.predictOptions(piece);
+          this.checkKings(piece, piece?.color);
+        }
+      }
+    }
+
     this.clearMovables();
+  }
+
+  checkKings(pieceFrom: Piece, colorAttack: 'w' | 'b') {
+    for (let i = 0; i < this.boardSize; i++) {
+      for (let j = 0; j < this.boardSize; j++) {
+        const piece = this.board[i][j].piece;
+
+        const name = piece?.name == 'king';
+        const color = piece?.color != colorAttack;
+        const movable = this.board[i][j].movable
+        
+        if (name && color && movable) {
+          console.log(pieceFrom)
+          this.board[i][j].piece!.inCheck = true;
+        }
+      }
+    }
   }
 
   clearMovables() {
@@ -382,7 +430,7 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  kingPrediction(isWhite: boolean, origin: cord) {
+  kingPredictions(isWhite: boolean, origin: cord) {
     const opponent = isWhite ? 'b' : 'w';
 
     this.checkFixedMove(origin, -1, -1, opponent);
@@ -393,6 +441,11 @@ export class BoardComponent implements OnInit {
     this.checkFixedMove(origin, 1, -1, opponent);
     this.checkFixedMove(origin, 1, 0, opponent);
     this.checkFixedMove(origin, 1, 1, opponent);
+  }
+
+  queenPredictions(isWhite: boolean, origin: cord) {
+    this.bishopPredictions(isWhite, origin);
+    this.rookPredictions(isWhite, origin);
   }
 
   checkFixedMove(origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b') {

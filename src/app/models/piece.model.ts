@@ -4,6 +4,7 @@ export class Piece {
     sprite: string = '';
     name: string;
     color: 'w' | 'b';
+    inCheck: boolean = false;
 
     constructor(i: number, j: number, name: string, sprite: string, color: 'w' | 'b') {
         this.i = i;
