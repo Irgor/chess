@@ -17,6 +17,7 @@ export class BoardComponent implements OnInit {
 
   boardSize = 8;
   board: Base[][] = [];
+  predictionBoard: Base[][] = [];
 
   isTarget = false;
   lastPiece: Piece | null = null;
@@ -127,13 +128,13 @@ export class BoardComponent implements OnInit {
         this.rookPredictions(isWhite, origin);
         break;
       case 'knight':
-        this.knightPredictions(isWhite, origin)
+        this.knightPredictions(isWhite, origin);
         break;
       case 'bishop':
-        this.bishopPredictions(isWhite, origin)
+        this.bishopPredictions(isWhite, origin);
         break;
       case 'king':
-        this.kingPredictions(isWhite, origin)
+        this.kingPredictions(isWhite, origin);
         break;
       case 'queen':
         this.queenPredictions(isWhite, origin);
@@ -180,14 +181,14 @@ export class BoardComponent implements OnInit {
         const piece = this.board[i][j].piece;
         if (piece) {
           this.predictOptions(piece);
-          this.checkKings(piece, piece?.color);
+          this.checkKings(piece?.color);
         }
         this.clearMovables();
       }
     }
   }
 
-  checkKings(pieceFrom: Piece, colorAttack: 'w' | 'b') {
+  checkKings(colorAttack: 'w' | 'b') {
     for (let i = 0; i < this.boardSize; i++) {
       for (let j = 0; j < this.boardSize; j++) {
         const piece = this.board[i][j].piece;
@@ -197,9 +198,25 @@ export class BoardComponent implements OnInit {
         const movable = this.board[i][j].movable
 
         if (name && color && movable) {
-          console.log(pieceFrom)
           this.board[i][j].piece!.inCheck = true;
+          this.isMate(colorAttack);
         }
+      }
+    }
+  }
+
+  isMate(colorAttack: 'w' | 'b') {
+    this.predictionBoard = this.board;
+
+    for (let i = 0; i < this.boardSize; i++) {
+      for (let j = 0; j < this.boardSize; j++) {
+        const piece = this.predictionBoard[i][j].piece;
+        const color = piece?.color != colorAttack;
+
+        if (color) {
+          this.isCheck()
+        }
+
       }
     }
   }
