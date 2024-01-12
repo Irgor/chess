@@ -151,6 +151,7 @@ export class BoardComponent implements OnInit {
   }
 
   endTurn() {
+    this.clearMovables();
     this.removeChecks();
     this.lastPiece = null;
     this.isTarget = false;
@@ -181,10 +182,9 @@ export class BoardComponent implements OnInit {
           this.predictOptions(piece);
           this.checkKings(piece, piece?.color);
         }
+        this.clearMovables();
       }
     }
-
-    this.clearMovables();
   }
 
   checkKings(pieceFrom: Piece, colorAttack: 'w' | 'b') {
@@ -195,7 +195,7 @@ export class BoardComponent implements OnInit {
         const name = piece?.name == 'king';
         const color = piece?.color != colorAttack;
         const movable = this.board[i][j].movable
-        
+
         if (name && color && movable) {
           console.log(pieceFrom)
           this.board[i][j].piece!.inCheck = true;
