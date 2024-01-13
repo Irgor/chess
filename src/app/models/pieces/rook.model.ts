@@ -4,8 +4,8 @@ import { Piece } from "../piece.model";
 
 export class Rook extends Piece {
 
-    override predictOptions(board: Base[][], origin: cord, isWhite: boolean): Base[][] {
-        const opponent = isWhite ? 'b' : 'w';
+    override predictOptions(board: Base[][]): Base[][] {
+        const opponent = this.color == 'w' ? 'b' : 'w';
 
         let higherI = this.boardSize;
         let lowerI = 0;
@@ -13,9 +13,9 @@ export class Rook extends Piece {
         let higherJ = this.boardSize;
         let lowerJ = 0;
 
-        for (let i = origin.i + 1; i < this.boardSize; i++) {
-            if (board[i][origin.j].piece) {
-                if (board[i][origin.j].piece?.color == opponent) {
+        for (let i = this.i + 1; i < this.boardSize; i++) {
+            if (board[i][this.j].piece) {
+                if (board[i][this.j].piece?.color == opponent) {
                     higherI = i;
                 } else {
                     higherI = i - 1
@@ -25,9 +25,9 @@ export class Rook extends Piece {
             }
         }
 
-        for (let i = origin.i - 1; i >= 0; i--) {
-            if (board[i][origin.j].piece) {
-                if (board[i][origin.j].piece?.color == opponent) {
+        for (let i = this.i - 1; i >= 0; i--) {
+            if (board[i][this.j].piece) {
+                if (board[i][this.j].piece?.color == opponent) {
                     lowerI = i;
                 } else {
                     lowerI = i + 1
@@ -37,9 +37,9 @@ export class Rook extends Piece {
             }
         }
 
-        for (let j = origin.j + 1; j < this.boardSize; j++) {
-            if (board[origin.i][j].piece) {
-                if (board[origin.i][j].piece?.color == opponent) {
+        for (let j = this.j + 1; j < this.boardSize; j++) {
+            if (board[this.i][j].piece) {
+                if (board[this.i][j].piece?.color == opponent) {
                     higherJ = j;
                 } else {
                     higherJ = j - 1;
@@ -49,9 +49,9 @@ export class Rook extends Piece {
             }
         }
 
-        for (let j = origin.j - 1; j >= 0; j--) {
-            if (board[origin.i][j].piece) {
-                if (board[origin.i][j].piece?.color == opponent) {
+        for (let j = this.j - 1; j >= 0; j--) {
+            if (board[this.i][j].piece) {
+                if (board[this.i][j].piece?.color == opponent) {
                     lowerJ = j;
                 } else {
                     lowerJ = j + 1;
@@ -63,15 +63,15 @@ export class Rook extends Piece {
 
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
-                if (i == origin.i && j == origin.j) {
+                if (i == this.i && j == this.j) {
                     continue;
                 }
 
-                if (j == origin.j && i <= higherI && i >= lowerI) {
+                if (j == this.j && i <= higherI && i >= lowerI) {
                     board[i][j].movable = true;
                 }
 
-                if (i == origin.i && j <= higherJ && j >= lowerJ) {
+                if (i == this.i && j <= higherJ && j >= lowerJ) {
                     board[i][j].movable = true;
                 }
             }
@@ -79,5 +79,5 @@ export class Rook extends Piece {
 
         return board
     }
-    
+
 }

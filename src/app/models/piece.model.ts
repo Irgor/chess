@@ -18,7 +18,7 @@ export class Piece {
         this.color = color;
     }
 
-    predictOptions(board: Base[][], origin: cord, isWhite: boolean): Base[][] { return [] }
+    predictOptions(board: Base[][]): Base[][] { return [] }
 
     checkFixedMove(board: Base[][], origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b'): Base[][] {
         if (board[origin.i - iMove]) {

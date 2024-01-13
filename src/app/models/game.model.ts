@@ -1,6 +1,13 @@
+import { Type } from "@angular/core";
 import { Base } from "./base.model";
 import { Piece } from "./piece.model";
 import { Rook } from "./pieces/rook.model";
+import { Knight } from "./pieces/knight.model";
+import { Pawn } from "./pieces/pawn.model";
+import { Bishop } from "./pieces/bishop.model";
+import { Queen } from "./pieces/queen.model";
+import { King } from "./pieces/king.model";
+import { cord } from "../components/board/board.component";
 
 export class Game {
     board: Base[][] = [];
@@ -12,26 +19,40 @@ export class Game {
 
     rounds = 0;
 
-    pieceOrder: Piece = [
+    pieceOrder: typeof Piece[] = [
         Rook,
-        // 'knight',
-        // 'bishop',
-        // 'queen',
-        // 'king',
-        // 'bishop',
-        // 'knight',
-        // 'rook'
+        Knight,
+        Bishop,
+        Queen,
+        King,
+        Bishop,
+        Knight,
+        Rook,
+        Pawn
+    ]
+
+    pieceNames = [
+        'rook',
+        'knight',
+        'bishop',
+        'queen',
+        'king',
+        'bishop',
+        'knight',
+        'rook',
+        'pawn'
     ]
 
     lastTileWasWhite = true;
 
     turn: 'w' | 'b' = 'w';
 
-    predictOptions(piece: Piece) {
-        const origin = { i: piece.i, j: piece.j };
-        const isWhite = piece.color == 'w';
+    constructor() {
+        this.startBoard();
+    }
 
-        this.board = piece.predictOptions(this.board, origin, isWhite);
+    predictOptions(piece: Piece) {
+        this.board = piece.predictOptions(this.board);
     }
 
     startBoard() {
@@ -61,23 +82,17 @@ export class Game {
         const pawnRow = row == 0 ? 1 : this.boardSize - 2;
 
         for (let i = 0; i < this.boardSize; i++) {
-
-            switch (this.pieceOrder[i]) {
-                case 'pawn':
-
-            }
             this.board[row][i].piece = new this.pieceOrder[i](
-                row, i, this.pieceOrder[i], `../../../assets/images/${color}_${this.pieceOrder[i]}.png`, color
+                row, i, this.pieceNames[i], `../../../assets/images/${color}_${this.pieceNames[i]}.png`, color
             )
         }
 
         for (let i = 0; i < this.boardSize; i++) {
-            this.board[pawnRow][i].piece = new Piece(
+            this.board[pawnRow][i].piece = new Pawn(
                 pawnRow, i, 'pawn', `../../../assets/images/${color}_pawn.png`, color
             )
         }
     }
-
 
     getTileSprite() {
         const currentTile = this.lastTileWasWhite ? 'light' : 'dark';
@@ -101,6 +116,46 @@ export class Game {
 
                 if (name) {
                     this.board[i][j].piece!.inCheck = false;
+                }
+            }
+        }
+    }
+
+    doMove(lastPiece: Piece, origin: cord) {
+        const index = this.pieceNames.indexOf(lastPiece.name);
+
+        const newPiece = new this.pieceOrder[index](
+            origin.i, origin.j, lastPiece.name, lastPiece.sprite, lastPiece.color
+        )
+
+        this.board[origin.i][origin.j].piece = newPiece;
+        this.board[lastPiece.i][lastPiece.j].piece = null;
+    }
+
+    isCheck() {
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const piece = this.board[i][j].piece;
+                if (piece) {
+                    this.predictOptions(piece);
+                    this.checkKings(piece?.color);
+                }
+                this.clearMovables();
+            }
+        }
+    }
+
+    checkKings(colorAttack: 'w' | 'b') {
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const piece = this.board[i][j].piece;
+
+                const name = piece?.name == 'king';
+                const color = piece?.color != colorAttack;
+                const movable = this.board[i][j].movable
+
+                if (name && color && movable) {
+                    this.board[i][j].piece!.inCheck = true;
                 }
             }
         }

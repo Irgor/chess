@@ -4,28 +4,29 @@ import { Piece } from "../piece.model";
 
 export class Pawn extends Piece {
 
-    override predictOptions(board: Base[][], origin: cord, isWhite: boolean): Base[][] {
+    override predictOptions(board: Base[][]): Base[][] {
+        const isWhite = this.color == 'w';
         let pawnMaxIMove = isWhite ? 1 : -1;
 
-        if (origin.i == 1 && isWhite) {
+        if (this.i == 1 && isWhite) {
             pawnMaxIMove = 2;
         }
 
-        if (origin.i == this.boardSize - 2 && !isWhite) {
+        if (this.i == this.boardSize - 2 && !isWhite) {
             pawnMaxIMove = -2;
         }
 
-        let j = origin.j;
+        let j = this.j;
         for (let i = 0; i < this.boardSize; i++) {
 
             if (isWhite) {
-                if (i <= origin.i + pawnMaxIMove && i > origin.i) {
+                if (i <= this.i + pawnMaxIMove && i > this.i) {
                     board[i][j].movable = !board[i][j].piece
                 }
             }
 
             if (!isWhite) {
-                if (i >= origin.i + pawnMaxIMove && i < origin.i) {
+                if (i >= this.i + pawnMaxIMove && i < this.i) {
                     board[i][j].movable = !board[i][j].piece
                 }
             }
@@ -35,17 +36,17 @@ export class Pawn extends Piece {
         const addI = isWhite ? 1 : -1;
         const opponent = isWhite ? 'b' : 'w';
 
-        if (board[origin.i + addI] && board[origin.i + addI][origin.j - 1]) {
-            const canTakeLeftCorner = board[origin.i + addI][origin.j - 1].piece?.color == opponent;
+        if (board[this.i + addI] && board[this.i + addI][this.j - 1]) {
+            const canTakeLeftCorner = board[this.i + addI][this.j - 1].piece?.color == opponent;
             if (canTakeLeftCorner) {
-                board[origin.i + addI][origin.j - 1].movable = true;
+                board[this.i + addI][this.j - 1].movable = true;
             }
         }
 
-        if (board[origin.i + addI] && board[origin.i + addI][origin.j + 1]) {
-            const canTakeRightCorner = board[origin.i + addI][origin.j + 1].piece?.color == opponent;
+        if (board[this.i + addI] && board[this.i + addI][this.j + 1]) {
+            const canTakeRightCorner = board[this.i + addI][this.j + 1].piece?.color == opponent;
             if (canTakeRightCorner) {
-                board[origin.i + addI][origin.j + 1].movable = true;
+                board[this.i + addI][this.j + 1].movable = true;
             }
         }
 
