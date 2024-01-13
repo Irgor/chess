@@ -1,4 +1,4 @@
-<div *ngFor="let row of board; index as i" class="row">
+<div *ngFor="let row of game.board; index as i" class="row">
     <div *ngFor="let base of row; index as j" class="base" [class]="base.spriteBase"
         (click)="move(base.piece, i, j, base.id, base.movable)"
         [ngClass]="{'pointer': base.piece?.color == turn || base.movable}">

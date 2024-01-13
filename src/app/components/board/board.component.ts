@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { max } from 'rxjs';
 import { Base } from 'src/app/models/base.model';
+import { Game } from 'src/app/models/game.model';
 import { Piece } from 'src/app/models/piece.model';
 
 export type cord = {
@@ -14,7 +15,7 @@ export type cord = {
   styleUrls: ['./board.component.scss']
 })
 export class BoardComponent implements OnInit {
-
+  game: Game;
   boardSize = 8;
   board: Base[][] = [];
   predictionBoard: Base[][] = [];
@@ -40,53 +41,12 @@ export class BoardComponent implements OnInit {
 
   turn: 'w' | 'b' = 'w';
 
+  constructor() {
+    this.game = new Game();
+  }
+
   ngOnInit(): void {
-    this.startBoard();
-  }
-
-  startBoard() {
-    let lastId = 0;
-    for (let i = 0; i < this.boardSize; i++) {
-      this.board.push([]);
-
-      for (let j = 0; j < this.boardSize; j++) {
-        lastId += 1;
-        this.board[i].push(
-          new Base(i, j, this.getTileSprite(), lastId)
-        )
-      }
-      this.lastTileWasWhite = !this.lastTileWasWhite;
-    }
-
-    this.startPieces();
-  }
-
-  startPieces() {
-    this.buildPieces('w', 'top');
-    this.buildPieces('b', 'bottom');
-  }
-
-  buildPieces(color: 'w' | 'b', pos: 'top' | 'bottom') {
-    const row = pos == 'top' ? 0 : this.boardSize - 1;
-    const pawnRow = row == 0 ? 1 : this.boardSize - 2;
-
-    for (let i = 0; i < this.boardSize; i++) {
-      this.board[row][i].piece = new Piece(
-        row, i, this.pieceOrder[i], `../../../assets/images/${color}_${this.pieceOrder[i]}.png`, color
-      )
-    }
-
-    for (let i = 0; i < this.boardSize; i++) {
-      this.board[pawnRow][i].piece = new Piece(
-        pawnRow, i, 'pawn', `../../../assets/images/${color}_pawn.png`, color
-      )
-    }
-  }
-
-  getTileSprite() {
-    const currentTile = this.lastTileWasWhite ? 'light' : 'dark';
-    this.lastTileWasWhite = !this.lastTileWasWhite;
-    return currentTile;
+    this.game.startBoard();
   }
 
   move(piece: Piece | undefined | null, i: number, j: number, id: number, movable: boolean) {
@@ -111,8 +71,8 @@ export class BoardComponent implements OnInit {
     this.idToMove = id;
     this.lastPiece = piece;
     this.isTarget = true;
-    this.clearMovables();
-    this.predictOptions(piece);
+    this.game.clearMovables();
+    this.game.predictOptions(piece);
   }
 
   predictOptions(piece: Piece) {
@@ -152,27 +112,14 @@ export class BoardComponent implements OnInit {
   }
 
   endTurn() {
-    this.clearMovables();
-    this.removeChecks();
+    this.game.clearMovables();
+    this.game.removeChecks();
     this.lastPiece = null;
     this.isTarget = false;
     this.turn = this.turn == 'w' ? 'b' : 'w';
     this.rounds++;
     this.idToMove = 0;
     this.isCheck();
-  }
-
-  removeChecks() {
-    for (let i = 0; i < this.boardSize; i++) {
-      for (let j = 0; j < this.boardSize; j++) {
-        const piece = this.board[i][j].piece;
-        const name = piece?.name == 'king';
-
-        if (name) {
-          this.board[i][j].piece!.inCheck = false;
-        }
-      }
-    }
   }
 
   isCheck() {
@@ -183,7 +130,7 @@ export class BoardComponent implements OnInit {
           this.predictOptions(piece);
           this.checkKings(piece?.color);
         }
-        this.clearMovables();
+        this.game.clearMovables();
       }
     }
   }
@@ -217,14 +164,6 @@ export class BoardComponent implements OnInit {
           this.isCheck()
         }
 
-      }
-    }
-  }
-
-  clearMovables() {
-    for (let i = 0; i < this.boardSize; i++) {
-      for (let j = 0; j < this.boardSize; j++) {
-        this.board[i][j].movable = false;
       }
     }
   }
@@ -364,7 +303,6 @@ export class BoardComponent implements OnInit {
 
     this.checkFixedMove(origin, -2, 1, opponent);
     this.checkFixedMove(origin, -2, -1, opponent);
-
   }
 
   bishopPredictions(isWhite: Boolean, origin: cord) {
