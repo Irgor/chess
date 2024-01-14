@@ -1,5 +1,4 @@
-import { cord } from "src/app/components/board/board.component";
-import { Base } from "../base.model";
+import { Base, cord } from "../base.model";
 import { Piece } from "../piece.model";
 
 export class Knight extends Piece {

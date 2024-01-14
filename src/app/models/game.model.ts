@@ -1,30 +1,23 @@
 import { Type } from "@angular/core";
-import { Base } from "./base.model";
+import { Base, cord } from "./base.model";
 import { Piece } from "./piece.model";
-import { Rook } from "./pieces/rook.model";
-import { Knight } from "./pieces/knight.model";
-import { Pawn } from "./pieces/pawn.model";
-import { Bishop } from "./pieces/bishop.model";
-import { Queen } from "./pieces/queen.model";
-import { King } from "./pieces/king.model";
-import { cord } from "../components/board/board.component";
+import { Rook, Knight, Pawn, Bishop, Queen, King } from './pieces/index'
 
 export class Game {
     board: Base[][] = [];
     boardSize = 8;
 
-    isTarget = false;
-    lastPiece: Piece | null = null;
-    idToMove = 0;
+    winner: string = '';
+    colorInCheck: 'w' | 'b' | '' = '';
 
-    rounds = 0;
+    lastPiece: Piece | null = null;
 
     pieceOrder: typeof Piece[] = [
         Rook,
         Knight,
         Bishop,
-        Queen,
         King,
+        Queen,
         Bishop,
         Knight,
         Rook,
@@ -35,8 +28,8 @@ export class Game {
         'rook',
         'knight',
         'bishop',
-        'queen',
         'king',
+        'queen',
         'bishop',
         'knight',
         'rook',
@@ -45,10 +38,12 @@ export class Game {
 
     lastTileWasWhite = true;
 
-    turn: 'w' | 'b' = 'w';
-
     constructor() {
         this.startBoard();
+    }
+
+    setBoard(newBoard: Base[][]) {
+        this.board = newBoard;
     }
 
     predictOptions(piece: Piece) {
@@ -94,6 +89,38 @@ export class Game {
         }
     }
 
+    promoteTo(piece: Piece, promote: string) {
+        const index = this.pieceNames.indexOf(promote);
+
+        const newPiece = new this.pieceOrder[index](
+            piece.i, piece.j, this.pieceNames[index], `../../../assets/images/${piece.color}_${this.pieceNames[index]}.png`, piece.color
+        )
+
+        this.board[piece.i][piece.j].piece = newPiece;
+        this.isCheck();
+    }
+
+    hasPromotions() {
+        for (let j = 0; j < this.boardSize; j++) {
+            const topPiece = this.board[0][j].piece;
+            const bottomPiece = this.board[this.boardSize - 1][j].piece;
+
+            this.checkPromotion(topPiece);
+            this.checkPromotion(bottomPiece);
+        }
+    }
+
+    checkPromotion(piece: Piece | null | undefined) {
+        if (!piece) {
+            return;
+        }
+
+        if (piece) {
+            const isPawn = piece.name == 'pawn';
+            piece.canPromote = isPawn
+        }
+    }
+
     getTileSprite() {
         const currentTile = this.lastTileWasWhite ? 'light' : 'dark';
         this.lastTileWasWhite = !this.lastTileWasWhite;
@@ -121,31 +148,35 @@ export class Game {
         }
     }
 
-    doMove(lastPiece: Piece, origin: cord) {
+    doMove(lastPiece: Piece, target: cord) {
         const index = this.pieceNames.indexOf(lastPiece.name);
 
         const newPiece = new this.pieceOrder[index](
-            origin.i, origin.j, lastPiece.name, lastPiece.sprite, lastPiece.color
+            target.i, target.j, lastPiece.name, lastPiece.sprite, lastPiece.color
         )
 
-        this.board[origin.i][origin.j].piece = newPiece;
+        this.board[target.i][target.j].piece = newPiece;
         this.board[lastPiece.i][lastPiece.j].piece = null;
     }
 
-    isCheck() {
+    isCheck(checkingForMate = true) {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
                 const piece = this.board[i][j].piece;
                 if (piece) {
                     this.predictOptions(piece);
-                    this.checkKings(piece?.color);
+                    this.isKingsOnCheck(piece?.color);
                 }
                 this.clearMovables();
             }
         }
+
+        if (this.hasCheck(this.colorInCheck) && checkingForMate) {
+            this.isMate(this.colorInCheck);
+        }
     }
 
-    checkKings(colorAttack: 'w' | 'b') {
+    isKingsOnCheck(colorAttack: 'w' | 'b') {
         for (let i = 0; i < this.boardSize; i++) {
             for (let j = 0; j < this.boardSize; j++) {
                 const piece = this.board[i][j].piece;
@@ -156,6 +187,115 @@ export class Game {
 
                 if (name && color && movable) {
                     this.board[i][j].piece!.inCheck = true;
+                    this.colorInCheck = piece.color
+                }
+            }
+        }
+    }
+
+    hasCheck(colorToCheck: 'w' | 'b' | ''): boolean {
+        if (!colorToCheck) {
+            return false;
+        }
+
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const piece = this.board[i][j].piece;
+
+                const name = piece?.name == 'king';
+                const color = piece?.color == colorToCheck;
+
+                if (name && color && piece.inCheck) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    hasMovables() {
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                if (this.board[i][j].movable) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    isMate(colorInCheck: 'w' | 'b' | '') {
+        if (!colorInCheck) {
+            return;
+        }
+
+        let lose = false;
+        let saved = false;
+
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const pieceToSave = this.board[i][j].piece;
+                if (pieceToSave && pieceToSave.color == colorInCheck) {
+
+                    const simulationGame = new Game();
+                    this.cloneBoard(simulationGame);
+                    simulationGame.predictOptions(pieceToSave);
+                    const hasMovables = simulationGame.hasMovables();
+
+                    if (!hasMovables) {
+                        continue
+                    }
+
+                    for (let i = 0; i < this.boardSize; i++) {
+                        for (let j = 0; j < this.boardSize; j++) {
+
+                            if (simulationGame.board[i][j].movable) {
+                                const savingSimulation = new Game();
+                                simulationGame.cloneBoard(savingSimulation);
+
+                                savingSimulation.doMove(pieceToSave, { i, j });
+
+                                savingSimulation.isCheck(false);
+                                lose = savingSimulation.hasCheck(pieceToSave.color);
+
+                                if (!lose) {
+                                    saved = true;
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if (lose && !saved) {
+            this.winner = colorInCheck == 'w' ? 'b' : 'w';
+        }
+    }
+
+    cloneBoard(simulationGame: Game) {
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const piece = this.board[i][j].piece;
+                if (piece) {
+                    const index = this.pieceNames.indexOf(piece.name);
+
+                    simulationGame.board[i][j] = new Base(
+                        i, j,
+                        this.board[i][j].spriteBase,
+                        this.board[i][j].id,
+                        new this.pieceOrder[index](
+                            i, j,
+                            piece.name,
+                            piece.sprite,
+                            piece.color,
+                        )
+                    )
+
                 }
             }
         }

@@ -1,4 +1,3 @@
-import { cord } from "src/app/components/board/board.component";
 import { Base } from "../base.model";
 import { Piece } from "../piece.model";
 

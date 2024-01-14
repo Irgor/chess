@@ -16,3 +16,8 @@ export class Base {
         this.piece = piece ?? null
     }
 }
+
+export type cord = {
+    i: number;
+    j: number;
+}

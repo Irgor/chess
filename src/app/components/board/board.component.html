@@ -1,15 +1,35 @@
 <div *ngFor="let row of game.board; index as i" class="row">
     <div *ngFor="let base of row; index as j" class="base" [class]="base.spriteBase"
         (click)="move(base.piece, i, j, base.id, base.movable)"
-        [ngClass]="{'pointer': base.piece?.color == turn || base.movable}">
+        [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !finished}">
 
-        <div *ngIf="base.piece" class="piece" [style.background-image]="'url(' + base.piece.sprite + ')'" [ngClass]="{'selected': idToMove == base.id, 'pointer': base.piece.color == turn || base.movable,
+        <div class="promotion" *ngIf="base.piece && base.piece.canPromote">
+            <div class="base dark" (click)="game.promoteTo(base.piece, 'rook')">
+                <img [src]="'../../../assets/images/' + base.piece.color + '_rook.png' " alt="">
+            </div>
+
+            <div class="base light" (click)="game.promoteTo(base.piece, 'knight')">
+                <img [src]="'../../../assets/images/' + base.piece.color + '_knight.png' " alt="">
+            </div>
+
+            <div class="base dark" (click)="game.promoteTo(base.piece, 'bishop')">
+                <img [src]="'../../../assets/images/' + base.piece.color + '_bishop.png' " alt="">
+            </div>
+
+            <div class="base light" (click)="game.promoteTo(base.piece, 'queen')">
+                <img [src]="'../../../assets/images/' + base.piece.color + '_queen.png' " alt="">
+            </div>
+        </div>
+
+        <div *ngIf="base.piece" class="piece" [style.background-image]="'url(' + base.piece.sprite + ')'" [ngClass]="{'selected': idToMove == base.id, 'pointer': (base.piece.color == turn || base.movable) && !finished,
         'check': base.piece.inCheck}" (click)="move(base.piece, i, j, base.id, base.movable)">
         </div>
 
-        <div class="movable" [ngClass]="{'pointer': base.piece?.color == turn || base.movable}" *ngIf="base.movable"
-            (click)="move(base.piece, i, j, base.id, base.movable)"></div>
+        <div class="movable" [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !finished}"
+            *ngIf="base.movable" (click)="move(base.piece, i, j, base.id, base.movable)"></div>
     </div>
+
+
 </div>
 
 <h1>{{turn == 'w' ? 'WHITE' : 'BLACK'}}'s TURN </h1>

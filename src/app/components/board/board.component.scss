@@ -14,6 +14,25 @@ $tile-size: 80px;
         align-items: center;
         position: relative;
 
+
+        .promotion {
+            left: 70px;
+            position: absolute;
+            z-index: 2;
+            display: flex;
+            flex-direction: row;
+            width: calc(80px *4);
+            height: 80px;
+            top: 10px;
+            border: 2px solid white;
+
+            img {
+                height: 80%;
+                margin: 2.5%;
+
+            }
+        }
+
         .piece {
             box-sizing: border-box;
             width: 100%;

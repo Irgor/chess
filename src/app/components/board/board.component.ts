@@ -1,13 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { max } from 'rxjs';
-import { Base } from 'src/app/models/base.model';
+import { Component } from '@angular/core';
+import { cord } from 'src/app/models/base.model';
 import { Game } from 'src/app/models/game.model';
 import { Piece } from 'src/app/models/piece.model';
-
-export type cord = {
-  i: number,
-  j: number
-}
 
 @Component({
   selector: 'board',
@@ -17,11 +11,10 @@ export type cord = {
 export class BoardComponent {
   game: Game;
 
-  isTarget = false;
+  finished = false;
+
   idToMove = 0;
   lastPiece: Piece | null = null;
-  rounds = 0;
-  lastTileWasWhite = true;
 
   turn: 'w' | 'b' = 'w';
 
@@ -30,9 +23,13 @@ export class BoardComponent {
   }
 
   move(piece: Piece | undefined | null, i: number, j: number, id: number, movable: boolean) {
-    if (this.isTarget && this.lastPiece && movable) {
-      const cord: cord = { i, j };
-      this.game.doMove(this.lastPiece, cord);
+    if (this.finished) {
+      return;
+    }
+
+    if (this.lastPiece && movable) {
+      const target: cord = { i, j };
+      this.game.doMove(this.lastPiece, target);
       this.endTurn();
       return;
     }
@@ -50,29 +47,29 @@ export class BoardComponent {
 
     this.idToMove = id;
     this.lastPiece = piece;
-    this.isTarget = true;
     this.game.clearMovables();
     this.game.predictOptions(piece);
   }
 
-  doMove(lastPiece: Piece, origin: cord) {
-    const newPiece = new Piece(
-      origin.i, origin.j, lastPiece.name, lastPiece.sprite, lastPiece.color
-    )
-
-    this.game.board[origin.i][origin.j].piece = newPiece;
-    this.game.board[lastPiece.i][lastPiece.j].piece = null;
-  }
-
-  endTurn() {
+  async endTurn() {
     this.game.clearMovables();
     this.game.removeChecks();
+    this.game.hasPromotions();
     this.lastPiece = null;
-    this.isTarget = false;
     this.turn = this.turn == 'w' ? 'b' : 'w';
-    this.rounds++;
     this.idToMove = 0;
     this.game.isCheck();
+
+    await this.delay(200);
+
+    if (this.game.winner != '') {
+      alert(`As ${this.game.winner == 'w' ? 'Brancas' : 'Pretas'} ganharam!!!`);
+      this.finished = true;
+    }
+  }
+
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
 }

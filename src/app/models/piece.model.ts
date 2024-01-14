@@ -1,5 +1,4 @@
-import { cord } from "../components/board/board.component";
-import { Base } from "./base.model";
+import { Base, cord } from "./base.model";
 
 export class Piece {
     boardSize = 8;
@@ -9,6 +8,7 @@ export class Piece {
     name: string;
     color: 'w' | 'b';
     inCheck: boolean = false;
+    canPromote: boolean = false;
 
     constructor(i: number, j: number, name: string, sprite: string, color: 'w' | 'b') {
         this.i = i;
