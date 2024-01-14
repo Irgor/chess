@@ -4,6 +4,7 @@ import { Piece } from "./piece.model";
 import { Rook, Knight, Pawn, Bishop, Queen, King } from './pieces/index'
 
 export class Game {
+    movesHistory: string[] = []
     board: Base[][] = [];
     boardSize = 8;
 
@@ -35,6 +36,29 @@ export class Game {
         'rook',
         'pawn'
     ]
+
+    pieceAbbreviation = [
+        'R',
+        'N',
+        'B',
+        'K',
+        'Q',
+        'B',
+        'K',
+        'R',
+        ''
+    ]
+
+    horizontalMap = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+    ];
 
     lastTileWasWhite = true;
 
@@ -148,15 +172,30 @@ export class Game {
         }
     }
 
-    doMove(lastPiece: Piece, target: cord) {
+    doMove(lastPiece: Piece, target: cord, registry = false) {
         const index = this.pieceNames.indexOf(lastPiece.name);
 
         const newPiece = new this.pieceOrder[index](
             target.i, target.j, lastPiece.name, lastPiece.sprite, lastPiece.color
         )
 
+        const wasCapture = !!this.board[target.i][target.j].piece;
+
         this.board[target.i][target.j].piece = newPiece;
         this.board[lastPiece.i][lastPiece.j].piece = null;
+
+        if (registry) {
+            this.regirtyMove(target.i, target.j, newPiece, wasCapture)
+        }
+    }
+
+    regirtyMove(i: number, j: number, piece: Piece, wasCapture: boolean) {
+        const index = this.pieceNames.indexOf(piece.name);
+        const mov = this.pieceAbbreviation[index] + (wasCapture ? 'x' : '') + this.horizontalMap[j] + (i + 1);
+
+        console.log(mov);
+
+        this.movesHistory.push(mov);
     }
 
     isCheck(checkingForMate = true) {

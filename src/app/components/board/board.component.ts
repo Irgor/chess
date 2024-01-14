@@ -29,7 +29,7 @@ export class BoardComponent {
 
     if (this.lastPiece && movable) {
       const target: cord = { i, j };
-      this.game.doMove(this.lastPiece, target);
+      this.game.doMove(this.lastPiece, target, true);
       this.endTurn();
       return;
     }
