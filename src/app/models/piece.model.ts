@@ -9,6 +9,7 @@ export class Piece {
     color: 'w' | 'b';
     inCheck: boolean = false;
     canPromote: boolean = false;
+    hasMoved = false;
 
     constructor(i: number, j: number, name: string, sprite: string, color: 'w' | 'b') {
         this.i = i;
@@ -18,7 +19,7 @@ export class Piece {
         this.color = color;
     }
 
-    predictOptions(board: Base[][]): Base[][] { return [] }
+    predictOptions(board: Base[][]): Base[][] { return []; }
 
     checkFixedMove(board: Base[][], origin: cord, iMove: number, jMove: number, opponent: 'w' | 'b'): Base[][] {
         if (board[origin.i - iMove]) {

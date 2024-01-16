@@ -173,11 +173,18 @@ export class Game {
     }
 
     doMove(lastPiece: Piece, target: cord, registry = false) {
-        const index = this.pieceNames.indexOf(lastPiece.name);
+        const piece = this.board[target.i][target.j].piece
 
+        if (piece && piece.name == 'rook' && lastPiece.name == 'king' && piece.color == lastPiece.color) {
+            this.doCastle(lastPiece, piece);
+            return;
+        }
+
+        const index = this.pieceNames.indexOf(lastPiece.name);
         const newPiece = new this.pieceOrder[index](
             target.i, target.j, lastPiece.name, lastPiece.sprite, lastPiece.color
         )
+        newPiece.hasMoved = true;
 
         const wasCapture = !!this.board[target.i][target.j].piece;
 
@@ -194,8 +201,28 @@ export class Game {
         const mov = this.pieceAbbreviation[index] + (wasCapture ? 'x' : '') + this.horizontalMap[j] + (i + 1);
 
         console.log(mov);
-
         this.movesHistory.push(mov);
+    }
+
+    doCastle(king: Piece, rook: Piece) {
+        const kingMove = rook.j < king.j ? -2 : 3;
+        const newKing = new King(
+            king.i, king.j + kingMove, 'king', king.sprite, king.color
+        )
+        king.hasMoved = true;
+        this.board[newKing.i][newKing.j].piece = newKing;
+        this.board[king.i][king.j].piece = null;
+
+        const rookMove = rook.j < king.j ? 1 : -1;
+        const newRook = new Rook(
+            newKing.i, newKing.j + rookMove, 'rook', rook.sprite, rook.color
+        );
+
+        this.board[newRook.i][newRook.j].piece = newRook;
+        this.board[rook.i][rook.j].piece = null;
+
+        console.log('O-O-O');
+        this.movesHistory.push('O-O-O');
     }
 
     isCheck(checkingForMate = true) {

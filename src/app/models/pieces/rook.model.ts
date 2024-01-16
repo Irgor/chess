@@ -1,5 +1,6 @@
-import { Base } from "../base.model";
+import { Base, cord } from "../base.model";
 import { Piece } from "../piece.model";
+import { King } from "./king.model";
 
 export class Rook extends Piece {
 
