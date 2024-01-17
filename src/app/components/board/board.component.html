@@ -1,7 +1,7 @@
 <div *ngFor="let row of game.board; index as i" class="row">
     <div *ngFor="let base of row; index as j" class="base" [class]="base.spriteBase"
         (click)="move(base.piece, i, j, base.id, base.movable)"
-        [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !finished}">
+        [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !stoped}">
 
         <div class="promotion" *ngIf="base.piece && base.piece.canPromote">
             <div class="base dark" (click)="game.promoteTo(base.piece, 'rook')">
@@ -21,11 +21,11 @@
             </div>
         </div>
 
-        <div *ngIf="base.piece" class="piece" [style.background-image]="'url(' + base.piece.sprite + ')'" [ngClass]="{'selected': idToMove == base.id, 'pointer': (base.piece.color == turn || base.movable) && !finished,
+        <div *ngIf="base.piece" class="piece" [style.background-image]="'url(' + base.piece.sprite + ')'" [ngClass]="{'selected': idToMove == base.id, 'pointer': (base.piece.color == turn || base.movable) && !stoped,
         'check': base.piece.inCheck}" (click)="move(base.piece, i, j, base.id, base.movable)">
         </div>
 
-        <div class="movable" [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !finished}"
+        <div class="movable" [ngClass]="{'pointer': (base.piece?.color == turn || base.movable) && !stoped}"
             *ngIf="base.movable" (click)="move(base.piece, i, j, base.id, base.movable)"></div>
     </div>
 

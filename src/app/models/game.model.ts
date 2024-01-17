@@ -1,4 +1,3 @@
-import { Type } from "@angular/core";
 import { Base, cord } from "./base.model";
 import { Piece } from "./piece.model";
 import { Rook, Knight, Pawn, Bishop, Queen, King } from './pieces/index'
@@ -38,14 +37,14 @@ export class Game {
     ]
 
     pieceAbbreviation = [
-        'R',
-        'N',
-        'B',
-        'K',
-        'Q',
-        'B',
-        'K',
-        'R',
+        'r',
+        'n',
+        'b',
+        'k',
+        'q',
+        'b',
+        'k',
+        'r',
         ''
     ]
 
@@ -367,4 +366,51 @@ export class Game {
         }
     }
 
+    mapPieces() {
+        const pieces: any = {};
+
+        for (let i = 0; i < this.boardSize; i++) {
+            for (let j = 0; j < this.boardSize; j++) {
+                const piece = this.board[i][j].piece;
+
+                if (piece) {
+
+                    const index = this.pieceNames.indexOf(piece.name);
+                    const pos = this.horizontalMap[j] + (i + 1);
+                    const abrv = this.pieceAbbreviation[index] == '' ? 'p' : this.pieceAbbreviation[index];
+
+
+                    if (piece.color == 'w') {
+                        pieces[pos.toUpperCase()] = abrv.toUpperCase();
+                    } else {
+                        pieces[pos.toUpperCase()] = abrv;
+                    }
+                }
+            }
+        }
+
+        return pieces;
+    }
+
+    doAIMove(from: string, target: string) {
+        const horizontal = this.horizontalMap;
+
+        const iFrom = (+from.split('')[1]) - 1;
+        const jFrom = horizontal.indexOf(from.split('')[0].toLocaleLowerCase());
+        const piece = this.board[iFrom][jFrom].piece;
+
+        const iTarget = (+target.split('')[1]) - 1;
+        const jTarget = horizontal.indexOf(target.split('')[0].toLocaleLowerCase());
+
+        if (piece) {
+            const index = this.pieceNames.indexOf(piece.name);
+            const newPiece = new this.pieceOrder[index](
+                iTarget, jTarget, piece.name, piece.sprite, piece.color
+            );
+            newPiece.hasMoved = true;
+
+            this.board[iTarget][jTarget].piece = newPiece;
+            this.board[iFrom][jFrom].piece = null;
+        }
+    }
 }
