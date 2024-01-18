@@ -7,9 +7,11 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
+  url = 'https://irgor-chess-api.onrender.com/';
+
   constructor(private http: HttpClient) { }
 
   getMove(body: any): Observable<any> {
-    return this.http.post('http://localhost:3000/chess/move', body);
+    return this.http.post(this.url + 'chess/move', body);
   }
 }
